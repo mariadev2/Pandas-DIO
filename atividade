@@ -1,0 +1,26 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+dados = pd.read_excel(r"C:\Users\pmari\OneDrive\Documentos\datasets\Salvador.xlsx")
+dados['Preco Un.'] = dados['Vendas'] / dados['Qtde']
+# dados['Preco Un.'] = dados['Preco Un.'].apply(lambda x: f"R$ {x:.2f}")
+# dados['Qtde'] = dados['Qtde'].apply(lambda x: f"{x} un.")
+
+
+
+print(dados.dtypes)
+print(dados)
+
+print(f"{'*'*7} Total de vendas por LojaID: {'*'*7} \n".upper())
+print(dados.groupby('LojaID')['Vendas'].sum())
+
+print(f"\n{'*'*7} Total de vendas por ano: {'*'*7} ".upper())
+print(dados.groupby(dados['Data'].dt.year)['Vendas'].sum())
+
+
+# dados['country;continent;year;lifeExp;pop;gdpPercap'] = dados['country;continent;year;lifeExp;pop;gdpPercap'].astype("int64")
+# print(dados.dtypes)
+
+dados['Data'].dt.year.value_counts(ascending=True).plot.barh(title="Gráfico", color = "red")
+plt.show()
