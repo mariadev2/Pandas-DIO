@@ -1,26 +1,40 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import plotly.express as px
 
 
-dados = pd.read_excel(r"C:\Users\pmari\OneDrive\Documentos\datasets\Salvador.xlsx")
-dados['Preco Un.'] = dados['Vendas'] / dados['Qtde']
-# dados['Preco Un.'] = dados['Preco Un.'].apply(lambda x: f"R$ {x:.2f}")
-# dados['Qtde'] = dados['Qtde'].apply(lambda x: f"{x} un.")
+d1 = pd.read_excel(r"C:\Users\pmari\OneDrive\Documentos\datasets\Salvador.xlsx")
+d2 = pd.read_excel(r"C:\Users\pmari\OneDrive\Documentos\datasets\Aracaju.xlsx")
+d3 = pd.read_excel(r"C:\Users\pmari\OneDrive\Documentos\datasets\Fortaleza.xlsx")
+d4 = pd.read_excel(r"C:\Users\pmari\OneDrive\Documentos\datasets\Natal.xlsx")
+d5 = pd.read_excel(r"C:\Users\pmari\OneDrive\Documentos\datasets\Recife.xlsx")
 
+#concatenando varias bases de dados em uma
+dados = pd.concat([d1,d2,d3,d4,d5])
 
-
-print(dados.dtypes)
+dados['Receita'] = dados['Vendas'].mul(dados['Qtde'])
 print(dados)
 
-print(f"{'*'*7} Total de vendas por LojaID: {'*'*7} \n".upper())
-print(dados.groupby('LojaID')['Vendas'].sum())
+agrupando_por_cidade = dados.groupby(['Cidade', dados['Data'].dt.year])['Receita'].sum().reset_index()
 
-print(f"\n{'*'*7} Total de vendas por ano: {'*'*7} ".upper())
-print(dados.groupby(dados['Data'].dt.year)['Vendas'].sum())
+print(agrupando_por_cidade)
 
+gafico_barra_horizontal = px.bar(agrupando_por_cidade, x = 'Receita' , y = 'Cidade', color = 'Data', orientation ='h')
+gafico_barra = px.bar(agrupando_por_cidade, x =  'Cidade', y = 'Receita', color = 'Data')
+gafico_barra.update_layout(
+    xaxis_title='Cidade',
+    yaxis_title='Receita',
+    title='Gráfico de Barras Agrupadas'
+)
+gafico_barra.show()
 
-# dados['country;continent;year;lifeExp;pop;gdpPercap'] = dados['country;continent;year;lifeExp;pop;gdpPercap'].astype("int64")
-# print(dados.dtypes)
+grafico_dispersao = px.scatter(agrupando_por_cidade, x = 'Receita', y = 'Cidade', color = 'Data')
+grafico_dispersao.show()
 
-dados['Data'].dt.year.value_counts(ascending=True).plot.barh(title="Gráfico", color = "red")
-plt.show()
+qtde_Cidade = dados['Cidade'].value_counts()
+print(qtde_Cidade.index)
+print(qtde_Cidade)
+grafico_pizza = px.pie(agrupando_por_cidade, names = 'Cidade', values = 'Receita',title = 'AGRUPAMENTO POR CIDADE/RECEITA')
+grafico_pizza.show()
+
